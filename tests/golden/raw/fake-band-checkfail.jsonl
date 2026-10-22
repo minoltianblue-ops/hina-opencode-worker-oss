@@ -1,0 +1,3 @@
+{"type": "step_start", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_1", "type": "step-start", "messageID": "msg_FAKE_1", "sessionID": "ses_FAKE_synthetic"}}
+{"type": "text", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_2", "type": "text", "messageID": "msg_FAKE_1", "sessionID": "ses_FAKE_synthetic", "text": "HINA_FAKE_OK"}}
+{"type": "step_finish", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_3", "type": "step-finish", "reason": "stop", "cost": 0, "tokens": {"input": 1, "output": 1}}}

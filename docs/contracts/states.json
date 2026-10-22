@@ -1,0 +1,83 @@
+{
+  "contract_version": "0.3",
+  "states": [
+    "accepted",
+    "starting",
+    "running",
+    "collecting",
+    "waiting_approval",
+    "waiting_model_selection",
+    "cancel_requested",
+    "completed",
+    "failed",
+    "cancelled",
+    "needs_attention"
+  ],
+  "initial": "accepted",
+  "terminal_for_attempt": [
+    "completed",
+    "failed",
+    "cancelled"
+  ],
+  "transitions": {
+    "accepted": [
+      "starting",
+      "failed",
+      "cancel_requested",
+      "needs_attention"
+    ],
+    "starting": [
+      "running",
+      "failed",
+      "waiting_model_selection",
+      "cancel_requested",
+      "needs_attention"
+    ],
+    "running": [
+      "collecting",
+      "waiting_approval",
+      "waiting_model_selection",
+      "failed",
+      "cancel_requested",
+      "needs_attention"
+    ],
+    "collecting": [
+      "completed",
+      "failed",
+      "cancel_requested",
+      "needs_attention"
+    ],
+    "waiting_approval": [
+      "running",
+      "cancel_requested",
+      "needs_attention"
+    ],
+    "waiting_model_selection": [
+      "starting",
+      "cancel_requested",
+      "needs_attention"
+    ],
+    "cancel_requested": [
+      "cancelled",
+      "needs_attention"
+    ],
+    "completed": [
+      "starting"
+    ],
+    "failed": [
+      "starting"
+    ],
+    "cancelled": [],
+    "needs_attention": [
+      "running",
+      "collecting",
+      "waiting_approval",
+      "waiting_model_selection",
+      "cancel_requested",
+      "completed",
+      "failed",
+      "cancelled"
+    ]
+  },
+  "notes": "Same-state observational updates are not transitions. New attempts for completed/failed -> starting require explicit followup/retry. needs_attention cannot auto-dispatch."
+}

@@ -1,0 +1,45 @@
+{
+  "scope": "Public OSS snapshot: published contract files only; excludes private original review and operational evidence",
+  "files": {
+    "docs/contracts/MCP.md": {
+      "bytes": 13050,
+      "sha256": "8958fa8fcec3957fc2044339159200987b267d1d13e14631fe64e3fc3661cd00"
+    },
+    "docs/contracts/OPENCODE_V2.md": {
+      "bytes": 7493,
+      "sha256": "810932a62205ac2d15dd6c7eb30c8940632b10af7cdc513557ca4f890d794d2f"
+    },
+    "docs/contracts/STORAGE.md": {
+      "bytes": 9710,
+      "sha256": "65a223973f6751e97bb23099984d9739196f86c5640c27d7b9a9c959e19c33ba"
+    },
+    "docs/contracts/WORKSPACE.md": {
+      "bytes": 7437,
+      "sha256": "f5d8b84641b47d78571fbde55568113a9c88c2b79be2c3d8c90acb1f7aaa164d"
+    },
+    "docs/contracts/mcp-tools.json": {
+      "bytes": 110117,
+      "sha256": "e1e55b2a067cebd6f00a67febf68d0ad217a9774e464f1ebe5a3541c16d006cf"
+    },
+    "docs/contracts/examples.json": {
+      "bytes": 13906,
+      "sha256": "29d83edef670285fda7bf7201703146c252fb128cae6362037224cec43598356"
+    },
+    "docs/contracts/schema.sql": {
+      "bytes": 6994,
+      "sha256": "9b7a622eae447eda317321808c6c607cd80f27985e6c46055d194a64151f7a69"
+    },
+    "docs/contracts/states.json": {
+      "bytes": 1704,
+      "sha256": "e3073dadc0fbbce3ae7ab173f617fa5606e8b18dc3347ef08c7fd644533be93b"
+    },
+    "docs/contracts/validate_spec.py": {
+      "bytes": 6278,
+      "sha256": "a3d620c76c484c59db2d0f73a62900aa003232c1974dd71bf6b965b7b7249ada"
+    },
+    "docs/contracts/package-manifest.json": {
+      "bytes": 274,
+      "sha256": "23e966d5cd3ee5e587f732ccf6df8c72a4a411fbd3c6c53afbb51e2bd0016e44"
+    }
+  }
+}

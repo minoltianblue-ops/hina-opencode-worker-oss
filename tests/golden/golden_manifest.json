@@ -1,0 +1,118 @@
+{
+  "schema_version": "m1-p2-golden/1",
+  "generated_by": "P2 worker (WT m1-p2, branch m1/p2/v2-adapter)",
+  "evidence_chain": {
+    "public_release": "Redacted and pseudonymized fixture set; original raw traces and development evidence remain private."
+  },
+  "note": "This manifest describes PUBLIC REDACTED offline regression fixtures, not original captures. Recorded session/turn/tool identifiers and personal workstation paths were pseudonymized. Hashes cover files in this public tree only.",
+  "fixtures": [
+    {
+      "path": "raw/m0-01-20261018T093748Z-stdout.jsonl",
+      "sha256": "8386ddc69fbaa34a24c845a9ddc37db105e20c114d7b29a8cafe75058fb7509a",
+      "data_kind": "SANITIZED_CAPTURE",
+      "provenance": "Sanitized offline sample derived from an observed OpenCode v2.0.30 event envelope. Original private capture not distributed."
+    },
+    {
+      "path": "raw/m0-02-20261018T093841Z-stdout.jsonl",
+      "sha256": "de5f58cf4e0e1aec8d736b70d19e7f2b2eca2489b1d19bc3aa567a7b7adedea0",
+      "data_kind": "SANITIZED_CAPTURE",
+      "provenance": "Sanitized offline sample derived from an observed OpenCode v2.0.30 event envelope. Original private capture not distributed."
+    },
+    {
+      "path": "raw/m0-03-20261018T094523Z-stdout.jsonl",
+      "sha256": "6959ae53058d2fcfabd3811262cd73c9ca58095e944fa629840409265eda151b",
+      "data_kind": "SANITIZED_CAPTURE",
+      "provenance": "Sanitized offline sample derived from an observed OpenCode v2.0.30 event envelope. Original private capture not distributed."
+    },
+    {
+      "path": "raw/fake-band-checkfail.jsonl",
+      "sha256": "3d3046e84f32005d553c68391da77817a54d5468214cb654f947ae497ebd771f",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "raw/fake-band-empty.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "raw/fake-band-error.jsonl",
+      "sha256": "9a077f0e41c553ca645990f9f3898ed54f0b5bb7b7a37004ec7669bc8fb0b25e",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "raw/fake-band-exit3.jsonl",
+      "sha256": "63d0689e5bb3a97eb088cae851b0db26f6bef6979a51266f6aacb333bf4efd47",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "raw/fake-band-malformed.jsonl",
+      "sha256": "c36df53e06afdf152b855be1a9de5b5f44e8375bddebd6cad4c41057f3da51c5",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "raw/fake-band-nofinish.jsonl",
+      "sha256": "7a7037f0b4fba5a4ef1916e66d4147ad4099ef2b14ee698aade0c375f3e55501",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "synthetic/dup-id.jsonl",
+      "sha256": "b1d83c55d1472c447f692f90e94862d1a88c570d74c7950cb28c6337b78bf853",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "synthetic/ends-on-step-finish.jsonl",
+      "sha256": "3479d4a8e3814229c6999e99e7950aee33b4938ea9f50e02d8554be1344b1a9a",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "synthetic/no-source-id.jsonl",
+      "sha256": "fbe9695258a13d5f9ba9e291d92ac74d0dc018c739261ea20853ec8eeaaae9c1",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "synthetic/permission-request.json",
+      "sha256": "680dc07d2d0e72b0e8238d5f2386e649f385c5a1dcfa357641e05698fe9b1acd",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "synthetic/prev-turn-final-then-current-open.jsonl",
+      "sha256": "9fb498a84f3f40cb466acba0515c5b26b6fd13238eb6b1cf6ab47476e59151fd",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "synthetic/tool-fail-exit0.jsonl",
+      "sha256": "84ab9d53118fa8530f3baf075359b1ff28564cae1dd792634712ae19fda4261d",
+      "data_kind": "SYNTHETIC",
+      "provenance": "Bundled synthetic regression fixture."
+    },
+    {
+      "path": "normalized/m0-01-normalized.json",
+      "sha256": "8feb75ebae4fae9de7812a1fef2cb118dc082077a57a0c7590b9afaeb7894e57",
+      "data_kind": "DERIVED_FROM_SANITIZED",
+      "provenance": "Identity projection from the corresponding sanitized public event fixture."
+    },
+    {
+      "path": "normalized/m0-02-normalized.json",
+      "sha256": "b7748e22d71107705e7fe18143dc2c8843e786199d1ba3aeae0fe8857aa7a810",
+      "data_kind": "DERIVED_FROM_SANITIZED",
+      "provenance": "Identity projection from the corresponding sanitized public event fixture."
+    },
+    {
+      "path": "normalized/m0-03-normalized.json",
+      "sha256": "7b788a44300ae88427f9ff1febfff60bc5a1d8b06b1d114308776f15ed2e22dc",
+      "data_kind": "DERIVED_FROM_SANITIZED",
+      "provenance": "Identity projection from the corresponding sanitized public event fixture."
+    }
+  ]
+}

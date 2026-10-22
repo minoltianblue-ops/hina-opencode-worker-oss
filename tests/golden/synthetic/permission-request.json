@@ -1,0 +1,1 @@
+{"id": "per_FAKE_syn01", "action": "edit", "resources": ["outside/secret.txt"], "save": [], "sessionID": "ses_FAKE_synthetic", "source": {"type": "message", "messageID": "msg_FAKE_perm", "id": "call_FAKE_perm1"}}

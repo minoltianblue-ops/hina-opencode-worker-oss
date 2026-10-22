@@ -1,0 +1,12 @@
+# Product bootstrap (P1/W1). Verified on Mac mini: Python 3.12.7,
+# stdlib sqlite3 3.45.3. ZERO third-party runtime dependencies; adding a
+# dependency requires explicit coordinator approval.
+[project]
+name = "hina-opencode-worker"
+version = "0.1.0"
+description = "Persistent approval-aware ChatGPT-to-OpenCode worker for macOS"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/minoltianblue-ops/hina-opencode-worker-oss"

@@ -1,0 +1,3 @@
+{"type": "text", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_dup", "type": "text", "messageID": "msg_FAKE_dup", "sessionID": "ses_FAKE_synthetic", "text": "same"}}
+{"type": "text", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_dup", "type": "text", "messageID": "msg_FAKE_dup", "sessionID": "ses_FAKE_synthetic", "text": "same"}}
+{"type": "text", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_dup", "type": "text", "messageID": "msg_FAKE_dup", "sessionID": "ses_FAKE_synthetic", "text": "DIFFERENT"}}

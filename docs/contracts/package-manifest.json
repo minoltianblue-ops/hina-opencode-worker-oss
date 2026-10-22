@@ -1,0 +1,10 @@
+{
+  "contract_version": "0.3",
+  "kind": "design_contract",
+  "product_runtime_implemented": false,
+  "api_schema": "mcp-tools.json",
+  "ddl": "schema.sql",
+  "state_machine": "states.json",
+  "examples": "examples.json",
+  "observed_v2_raw_event_fixtures_present": false
+}

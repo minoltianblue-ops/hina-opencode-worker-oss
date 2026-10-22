@@ -1,0 +1,3 @@
+{"type": "step_start", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_sf1", "type": "step-start", "messageID": "msg_FAKE_sf", "sessionID": "ses_FAKE_synthetic"}}
+{"type": "text", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_sf2", "type": "text", "messageID": "msg_FAKE_sf", "sessionID": "ses_FAKE_synthetic", "text": "working"}}
+{"type": "step_finish", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_sf3", "type": "step-finish", "reason": "tool-calls", "cost": 0, "tokens": {"input": 1, "output": 1, "reasoning": 0, "cache": {"read": 0, "write": 0}}, "messageID": "msg_FAKE_sf", "sessionID": "ses_FAKE_synthetic"}}

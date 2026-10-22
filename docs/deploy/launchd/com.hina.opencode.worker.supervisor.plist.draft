@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+ "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- DRAFT — NOT INSTALLABLE AS-IS, MUST NOT BE LOADED (M4-A2 scope).
+  * This is the launchd artifact DRAFT only. M4_WORK_PACKAGES: plist
+    "설치"는 별도 승인 후. Do NOT run launchctl bootstrap/bootstrap —
+    registering a permanent service is a separate user decision.
+  * __PLACEHOLDER__ tokens (interpreter, repo, root, home) are filled
+    with absolute paths AT INSTALL APPROVAL, together with the live
+    service entry (LiveBackend wiring + binary pin), which is not part
+    of A2. Until then this file is documentation.
+  * User-level LaunchAgent (gui domain), RunAtLoad + KeepAlive on the
+    MANAGED RUN wrapper (supervise_run.py run): launchd supervises the
+    wrapper; the wrapper supervises the supervisor child (crash
+    restart, journal preserved). Wrapper exit 0 = operator stop ->
+    KeepAlive{SuccessfulExit=false} does NOT restart it. Wrapper exit
+    70 (crash-storm give-up) -> launchd restarts after ThrottleInterval
+    instead of a hot loop.
+  * No Root key (never a daemon), no other user's account, RunOnlyAtLoad
+    unset, logs under the supervisor root (0700) with the wrapper's own
+    size-based retention. Umask 0077 keeps run/db/logs private.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hina.opencode.worker.supervisor</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>__PYTHON3_312__</string>
+    <string>__REPO__/experiments/m4/a2/supervise_run.py</string>
+    <string>run</string>
+    <string>--root</string>
+    <string>__SUPERVISOR_ROOT__</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>__REPO__</string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+    <key>Crashed</key>
+    <true/>
+  </dict>
+
+  <key>ThrottleInterval</key>
+  <integer>30</integer>
+
+  <key>StandardOutPath</key>
+  <string>__SUPERVISOR_ROOT__/logs/launchd.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>__SUPERVISOR_ROOT__/logs/launchd.err.log</string>
+
+  <key>Umask</key>
+  <integer>63</integer>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>

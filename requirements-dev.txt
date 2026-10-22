@@ -1,0 +1,2 @@
+# Optional offline schema validation; no mandatory runtime pip dependencies.
+jsonschema>=4.21,<5

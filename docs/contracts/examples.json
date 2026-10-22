@@ -1,0 +1,442 @@
+{
+  "evidence_level": "synthetic_schema_examples_not_live_output",
+  "examples": [
+    {
+      "tool": "worker_catalog",
+      "input": {},
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_catalog",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "data": {
+          "engine": {
+            "version": "2.0.30",
+            "binary_sha256": null,
+            "mapping_revision": null
+          },
+          "models": [
+            {
+              "id": "opencode/glm-5.3-flash-free",
+              "billing_class": "free",
+              "enabled": false,
+              "probe_status": "help_only"
+            }
+          ],
+          "profiles": [
+            "inspect",
+            "develop"
+          ],
+          "capabilities": {
+            "launch": false,
+            "interrupt": false
+          },
+          "gate": "BLOCKED"
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_catalog",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    },
+    {
+      "tool": "worker_start",
+      "input": {
+        "request_id": "req_33333333-3333-4333-8333-333333333333",
+        "user_request_ref": "chat:explicit-task-001",
+        "goal": "Fix the synthetic calculator and add validation",
+        "workspace": {
+          "repository": "/Users/example/fixture",
+          "source_ref": "HEAD"
+        },
+        "profile": "develop",
+        "model": "opencode/glm-5.3-flash-free",
+        "constraints": [
+          "Only change files in the assigned worktree"
+        ],
+        "done_when": [
+          "The declared tests pass"
+        ],
+        "verification_commands": [
+          {
+            "argv": [
+              "python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "tests",
+              "-v"
+            ]
+          }
+        ]
+      },
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_start",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "data": {
+          "job": {
+            "job_id": "job_11111111-1111-4111-8111-111111111111",
+            "active_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+            "state": "accepted",
+            "verification_status": "not_run",
+            "acceptance": "pending",
+            "model": "opencode/glm-5.3-flash-free",
+            "workspace": null,
+            "created_at": "2026-10-18T06:00:00Z",
+            "updated_at": "2026-10-18T06:00:00Z",
+            "result_revision": null,
+            "attention_reason": null,
+            "pending_approvals": []
+          }
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_start",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    },
+    {
+      "tool": "worker_status",
+      "input": {
+        "job_id": "job_11111111-1111-4111-8111-111111111111"
+      },
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_status",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "data": {
+          "jobs": [
+            {
+              "job_id": "job_11111111-1111-4111-8111-111111111111",
+              "active_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+              "state": "running",
+              "verification_status": "not_run",
+              "acceptance": "pending",
+              "model": "opencode/glm-5.3-flash-free",
+              "workspace": "/Users/example/worktrees/example",
+              "created_at": "2026-10-18T06:00:00Z",
+              "updated_at": "2026-10-18T06:00:00Z",
+              "result_revision": null,
+              "attention_reason": null,
+              "pending_approvals": []
+            }
+          ],
+          "next_cursor": null,
+          "snapshot_id": "synthetic-snapshot-1"
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_status",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    },
+    {
+      "tool": "worker_wait",
+      "input": {
+        "job_id": "job_11111111-1111-4111-8111-111111111111",
+        "wait_ms": 20000
+      },
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_wait",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "data": {
+          "job": {
+            "job_id": "job_11111111-1111-4111-8111-111111111111",
+            "active_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+            "state": "running",
+            "verification_status": "not_run",
+            "acceptance": "pending",
+            "model": "opencode/glm-5.3-flash-free",
+            "workspace": "/Users/example/worktrees/example",
+            "created_at": "2026-10-18T06:00:00Z",
+            "updated_at": "2026-10-18T06:00:00Z",
+            "result_revision": null,
+            "attention_reason": null,
+            "pending_approvals": []
+          },
+          "wait_expired": true
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_wait",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    },
+    {
+      "tool": "worker_result",
+      "input": {
+        "job_id": "job_11111111-1111-4111-8111-111111111111",
+        "section": "summary"
+      },
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_result",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "data": {
+          "job": {
+            "job_id": "job_11111111-1111-4111-8111-111111111111",
+            "active_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+            "state": "completed",
+            "verification_status": "not_run",
+            "acceptance": "pending",
+            "model": "opencode/glm-5.3-flash-free",
+            "workspace": "/Users/example/worktrees/example",
+            "created_at": "2026-10-18T06:00:00Z",
+            "updated_at": "2026-10-18T06:00:00Z",
+            "result_revision": 1,
+            "attention_reason": null,
+            "pending_approvals": []
+          },
+          "result_revision": 1,
+          "section": "summary",
+          "items": [
+            {
+              "kind": "summary",
+              "text": "Synthetic schema example; not a measured model response.",
+              "verification_status": "not_run",
+              "truncated": false
+            }
+          ],
+          "next_cursor": null,
+          "truncated": false
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_result",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": null,
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    },
+    {
+      "tool": "worker_followup",
+      "input": {
+        "request_id": "req_33333333-3333-4333-8333-333333333333",
+        "user_request_ref": "chat:followup-001",
+        "job_id": "job_11111111-1111-4111-8111-111111111111",
+        "expected_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+        "mode": "continue",
+        "message": "Add the missing negative-value case"
+      },
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_followup",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "data": {
+          "job": {
+            "job_id": "job_11111111-1111-4111-8111-111111111111",
+            "active_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+            "state": "starting",
+            "verification_status": "not_run",
+            "acceptance": "pending",
+            "model": "opencode/glm-5.3-flash-free",
+            "workspace": "/Users/example/worktrees/example",
+            "created_at": "2026-10-18T06:00:00Z",
+            "updated_at": "2026-10-18T06:00:00Z",
+            "result_revision": null,
+            "attention_reason": null,
+            "pending_approvals": []
+          }
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_followup",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    },
+    {
+      "tool": "worker_cancel",
+      "input": {
+        "request_id": "req_33333333-3333-4333-8333-333333333333",
+        "job_id": "job_11111111-1111-4111-8111-111111111111",
+        "expected_attempt_id": "att_22222222-2222-4222-8222-222222222222"
+      },
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_cancel",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "data": {
+          "job": {
+            "job_id": "job_11111111-1111-4111-8111-111111111111",
+            "active_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+            "state": "cancel_requested",
+            "verification_status": "not_run",
+            "acceptance": "pending",
+            "model": "opencode/glm-5.3-flash-free",
+            "workspace": "/Users/example/worktrees/example",
+            "created_at": "2026-10-18T06:00:00Z",
+            "updated_at": "2026-10-18T06:00:00Z",
+            "result_revision": null,
+            "attention_reason": null,
+            "pending_approvals": []
+          },
+          "cancel_requested": true
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_cancel",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    },
+    {
+      "tool": "worker_approve",
+      "input": {
+        "request_id": "req_33333333-3333-4333-8333-333333333333",
+        "job_id": "job_11111111-1111-4111-8111-111111111111",
+        "attempt_id": "att_22222222-2222-4222-8222-222222222222",
+        "approval_id": "apr_44444444-4444-4444-8444-444444444444",
+        "challenge": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "decision": "deny",
+        "user_decision_ref": "chat:user-denial-001"
+      },
+      "output": {
+        "contract_version": "0.3",
+        "tool": "worker_approve",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "data": {
+          "job": {
+            "job_id": "job_11111111-1111-4111-8111-111111111111",
+            "active_attempt_id": "att_22222222-2222-4222-8222-222222222222",
+            "state": "cancel_requested",
+            "verification_status": "not_run",
+            "acceptance": "pending",
+            "model": "opencode/glm-5.3-flash-free",
+            "workspace": "/Users/example/worktrees/example",
+            "created_at": "2026-10-18T06:00:00Z",
+            "updated_at": "2026-10-18T06:00:00Z",
+            "result_revision": null,
+            "attention_reason": null,
+            "pending_approvals": []
+          },
+          "approval_id": "apr_44444444-4444-4444-8444-444444444444",
+          "decision_recorded": true
+        }
+      },
+      "error_output": {
+        "contract_version": "0.3",
+        "tool": "worker_approve",
+        "observed_at": "2026-10-18T06:00:00Z",
+        "receipt": {
+          "request_id": "req_33333333-3333-4333-8333-333333333333",
+          "replayed": false
+        },
+        "error": {
+          "code": "INVALID_ARGUMENT",
+          "message": "Synthetic error example",
+          "retryable": false,
+          "details": {}
+        }
+      }
+    }
+  ],
+  "note": "Independent examples for shape validation, not a sequential execution trace."
+}

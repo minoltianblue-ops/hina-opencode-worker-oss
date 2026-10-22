@@ -1,0 +1,3500 @@
+{
+  "contract_version": "0.3",
+  "kind": "implementation_spec_not_live_tools",
+  "tools": [
+    {
+      "name": "worker_catalog",
+      "description": "Query approved models, runtime contract fingerprint and capabilities; no inference.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "refresh": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_catalog"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "engine": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "binary_sha256": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "mapping_revision": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "version",
+                  "binary_sha256",
+                  "mapping_revision"
+                ],
+                "additionalProperties": false
+              },
+              "models": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512,
+                      "pattern": "^[^\\s/]+/[^\\s]+$"
+                    },
+                    "billing_class": {
+                      "type": "string",
+                      "enum": [
+                        "free",
+                        "go",
+                        "unknown"
+                      ]
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "probe_status": {
+                      "type": "string",
+                      "enum": [
+                        "unverified",
+                        "help_only",
+                        "live_verified",
+                        "unavailable"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "billing_class",
+                    "enabled",
+                    "probe_status"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0,
+                "maxItems": 500
+              },
+              "profiles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "inspect",
+                    "develop"
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 2
+              },
+              "capabilities": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "boolean"
+                }
+              },
+              "gate": {
+                "type": "string",
+                "enum": [
+                  "BLOCKED",
+                  "PASS"
+                ]
+              }
+            },
+            "required": [
+              "engine",
+              "models",
+              "profiles",
+              "capabilities",
+              "gate"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "worker_start",
+      "description": "Accept one scoped task durably; never wait for the first model token.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "user_request_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "goal": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "workspace": {
+            "type": "object",
+            "properties": {
+              "repository": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096
+              },
+              "source_ref": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "default": "HEAD",
+                "pattern": "^(?!-)[^\\s\\x00]+$"
+              },
+              "include_existing_changes": {
+                "type": "boolean",
+                "default": false
+              },
+              "context_files": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                },
+                "minItems": 0,
+                "maxItems": 200
+              },
+              "use_committed_only": {
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "repository"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "include_existing_changes": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "include_existing_changes"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "context_files"
+                  ],
+                  "properties": {
+                    "context_files": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      "minItems": 1,
+                      "maxItems": 200
+                    },
+                    "use_committed_only": {
+                      "const": false
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "profile": {
+            "type": "string",
+            "enum": [
+              "inspect",
+              "develop"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[^\\s/]+/[^\\s]+$"
+          },
+          "constraints": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "minItems": 0,
+            "maxItems": 50
+          },
+          "done_when": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "minItems": 1,
+            "maxItems": 50
+          },
+          "context": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 24000
+          },
+          "verification_commands": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "argv": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 4096
+                  },
+                  "minItems": 1,
+                  "maxItems": 128
+                },
+                "cwd_relative": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024,
+                  "default": "."
+                },
+                "timeout_ms": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3600000
+                }
+              },
+              "required": [
+                "argv"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 20
+          }
+        },
+        "required": [
+          "request_id",
+          "user_request_ref",
+          "goal",
+          "workspace",
+          "profile",
+          "model",
+          "constraints",
+          "done_when"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_start"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "job": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "active_attempt_id": {
+                    "type": "string",
+                    "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "starting",
+                      "running",
+                      "collecting",
+                      "waiting_approval",
+                      "waiting_model_selection",
+                      "cancel_requested",
+                      "completed",
+                      "failed",
+                      "cancelled",
+                      "needs_attention"
+                    ]
+                  },
+                  "verification_status": {
+                    "type": "string",
+                    "enum": [
+                      "not_run",
+                      "passed",
+                      "failed",
+                      "partial",
+                      "unknown"
+                    ]
+                  },
+                  "acceptance": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[^\\s/]+/[^\\s]+$"
+                  },
+                  "workspace": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "result_revision": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "attention_reason": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pending_approvals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "approval_id": {
+                          "type": "string",
+                          "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "attempt_id": {
+                          "type": "string",
+                          "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "scope_summary": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "scope_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "challenge": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 43,
+                              "maxLength": 128,
+                              "pattern": "^[A-Za-z0-9_-]+$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "channel_status": {
+                          "type": "string",
+                          "enum": [
+                            "verified",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "approval_id",
+                        "attempt_id",
+                        "action",
+                        "scope_summary",
+                        "scope_sha256",
+                        "challenge",
+                        "expires_at",
+                        "channel_status"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0,
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "active_attempt_id",
+                  "state",
+                  "verification_status",
+                  "acceptance",
+                  "model",
+                  "workspace",
+                  "created_at",
+                  "updated_at",
+                  "result_revision",
+                  "attention_reason",
+                  "pending_approvals"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "job"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "worker_status",
+      "description": "Read one job or a stable recent-job snapshot. No prompt dispatch.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "accepted",
+                "starting",
+                "running",
+                "collecting",
+                "waiting_approval",
+                "waiting_model_selection",
+                "cancel_requested",
+                "completed",
+                "failed",
+                "cancelled",
+                "needs_attention"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 11
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "required": [],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "job_id"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "states"
+                  ]
+                },
+                {
+                  "required": [
+                    "cursor"
+                  ]
+                },
+                {
+                  "required": [
+                    "limit"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "job_id"
+              ]
+            }
+          }
+        ]
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_status"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "jobs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "job_id": {
+                      "type": "string",
+                      "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                    },
+                    "active_attempt_id": {
+                      "type": "string",
+                      "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                    },
+                    "state": {
+                      "type": "string",
+                      "enum": [
+                        "accepted",
+                        "starting",
+                        "running",
+                        "collecting",
+                        "waiting_approval",
+                        "waiting_model_selection",
+                        "cancel_requested",
+                        "completed",
+                        "failed",
+                        "cancelled",
+                        "needs_attention"
+                      ]
+                    },
+                    "verification_status": {
+                      "type": "string",
+                      "enum": [
+                        "not_run",
+                        "passed",
+                        "failed",
+                        "partial",
+                        "unknown"
+                      ]
+                    },
+                    "acceptance": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "accepted",
+                        "rejected"
+                      ]
+                    },
+                    "model": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512,
+                      "pattern": "^[^\\s/]+/[^\\s]+$"
+                    },
+                    "workspace": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "result_revision": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "attention_reason": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 2000
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "pending_approvals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "approval_id": {
+                            "type": "string",
+                            "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                          },
+                          "attempt_id": {
+                            "type": "string",
+                            "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                          },
+                          "action": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 256
+                          },
+                          "scope_summary": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 4096
+                          },
+                          "scope_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "challenge": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 43,
+                                "maxLength": 128,
+                                "pattern": "^[A-Za-z0-9_-]+$"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "expires_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "channel_status": {
+                            "type": "string",
+                            "enum": [
+                              "verified",
+                              "unavailable"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "approval_id",
+                          "attempt_id",
+                          "action",
+                          "scope_summary",
+                          "scope_sha256",
+                          "challenge",
+                          "expires_at",
+                          "channel_status"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 0,
+                      "maxItems": 20
+                    }
+                  },
+                  "required": [
+                    "job_id",
+                    "active_attempt_id",
+                    "state",
+                    "verification_status",
+                    "acceptance",
+                    "model",
+                    "workspace",
+                    "created_at",
+                    "updated_at",
+                    "result_revision",
+                    "attention_reason",
+                    "pending_approvals"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "snapshot_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              }
+            },
+            "required": [
+              "jobs",
+              "next_cursor",
+              "snapshot_id"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "worker_wait",
+      "description": "Wait up to 25 seconds without holding a mutation lock. Expiry never cancels the job.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "wait_ms": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 25000,
+            "default": 20000
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_wait"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "job": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "active_attempt_id": {
+                    "type": "string",
+                    "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "starting",
+                      "running",
+                      "collecting",
+                      "waiting_approval",
+                      "waiting_model_selection",
+                      "cancel_requested",
+                      "completed",
+                      "failed",
+                      "cancelled",
+                      "needs_attention"
+                    ]
+                  },
+                  "verification_status": {
+                    "type": "string",
+                    "enum": [
+                      "not_run",
+                      "passed",
+                      "failed",
+                      "partial",
+                      "unknown"
+                    ]
+                  },
+                  "acceptance": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[^\\s/]+/[^\\s]+$"
+                  },
+                  "workspace": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "result_revision": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "attention_reason": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pending_approvals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "approval_id": {
+                          "type": "string",
+                          "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "attempt_id": {
+                          "type": "string",
+                          "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "scope_summary": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "scope_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "challenge": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 43,
+                              "maxLength": 128,
+                              "pattern": "^[A-Za-z0-9_-]+$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "channel_status": {
+                          "type": "string",
+                          "enum": [
+                            "verified",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "approval_id",
+                        "attempt_id",
+                        "action",
+                        "scope_summary",
+                        "scope_sha256",
+                        "challenge",
+                        "expires_at",
+                        "channel_status"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0,
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "active_attempt_id",
+                  "state",
+                  "verification_status",
+                  "acceptance",
+                  "model",
+                  "workspace",
+                  "created_at",
+                  "updated_at",
+                  "result_revision",
+                  "attention_reason",
+                  "pending_approvals"
+                ],
+                "additionalProperties": false
+              },
+              "wait_expired": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "job",
+              "wait_expired"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "worker_result",
+      "description": "Page through immutable exported results; private raw output is not exposed.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "attempt_id": {
+            "type": "string",
+            "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "section": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "checks",
+              "changes",
+              "artifacts",
+              "content"
+            ],
+            "default": "summary"
+          },
+          "artifact_id": {
+            "type": "string",
+            "pattern": "^art_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 50
+          },
+          "byte_limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65536,
+            "default": 16384
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "section": {
+                  "const": "content"
+                }
+              },
+              "required": [
+                "section"
+              ]
+            },
+            "then": {
+              "required": [
+                "artifact_id"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "artifact_id"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_result"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "job": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "active_attempt_id": {
+                    "type": "string",
+                    "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "starting",
+                      "running",
+                      "collecting",
+                      "waiting_approval",
+                      "waiting_model_selection",
+                      "cancel_requested",
+                      "completed",
+                      "failed",
+                      "cancelled",
+                      "needs_attention"
+                    ]
+                  },
+                  "verification_status": {
+                    "type": "string",
+                    "enum": [
+                      "not_run",
+                      "passed",
+                      "failed",
+                      "partial",
+                      "unknown"
+                    ]
+                  },
+                  "acceptance": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[^\\s/]+/[^\\s]+$"
+                  },
+                  "workspace": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "result_revision": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "attention_reason": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pending_approvals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "approval_id": {
+                          "type": "string",
+                          "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "attempt_id": {
+                          "type": "string",
+                          "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "scope_summary": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "scope_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "challenge": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 43,
+                              "maxLength": 128,
+                              "pattern": "^[A-Za-z0-9_-]+$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "channel_status": {
+                          "type": "string",
+                          "enum": [
+                            "verified",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "approval_id",
+                        "attempt_id",
+                        "action",
+                        "scope_summary",
+                        "scope_sha256",
+                        "challenge",
+                        "expires_at",
+                        "channel_status"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0,
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "active_attempt_id",
+                  "state",
+                  "verification_status",
+                  "acceptance",
+                  "model",
+                  "workspace",
+                  "created_at",
+                  "updated_at",
+                  "result_revision",
+                  "attention_reason",
+                  "pending_approvals"
+                ],
+                "additionalProperties": false
+              },
+              "result_revision": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "section": {
+                "type": "string",
+                "enum": [
+                  "summary",
+                  "checks",
+                  "changes",
+                  "artifacts",
+                  "content"
+                ]
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "summary"
+                        },
+                        "text": {
+                          "type": "string",
+                          "minLength": 0,
+                          "maxLength": 16000
+                        },
+                        "verification_status": {
+                          "type": "string",
+                          "enum": [
+                            "not_run",
+                            "passed",
+                            "failed",
+                            "partial",
+                            "unknown"
+                          ]
+                        },
+                        "truncated": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "text",
+                        "verification_status",
+                        "truncated"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "check"
+                        },
+                        "command": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 8192
+                        },
+                        "cwd": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "exit_code": {
+                          "anyOf": [
+                            {
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "verdict": {
+                          "type": "string",
+                          "enum": [
+                            "not_run",
+                            "passed",
+                            "failed",
+                            "unknown",
+                            "stale"
+                          ]
+                        },
+                        "source_snapshot_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "evidence_artifact_id": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^art_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "command",
+                        "cwd",
+                        "exit_code",
+                        "verdict",
+                        "source_snapshot_sha256",
+                        "evidence_artifact_id"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "change"
+                        },
+                        "path": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "old_path": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 4096
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "change_kind": {
+                          "type": "string",
+                          "enum": [
+                            "added",
+                            "modified",
+                            "deleted",
+                            "renamed",
+                            "type_changed"
+                          ]
+                        },
+                        "file_type": {
+                          "type": "string",
+                          "enum": [
+                            "file",
+                            "binary",
+                            "symlink",
+                            "gitlink"
+                          ]
+                        },
+                        "before_sha256": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "after_sha256": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "artifact_id": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "pattern": "^art_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "path",
+                        "old_path",
+                        "change_kind",
+                        "file_type",
+                        "before_sha256",
+                        "after_sha256",
+                        "artifact_id"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "artifact"
+                        },
+                        "artifact_id": {
+                          "type": "string",
+                          "pattern": "^art_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "media_type": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "bytes": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "redacted": {
+                          "type": "boolean"
+                        },
+                        "complete": {
+                          "type": "boolean"
+                        },
+                        "applyable": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "artifact_id",
+                        "media_type",
+                        "bytes",
+                        "sha256",
+                        "redacted",
+                        "complete",
+                        "applyable"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "chunk"
+                        },
+                        "artifact_id": {
+                          "type": "string",
+                          "pattern": "^art_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "encoding": {
+                          "const": "base64"
+                        },
+                        "data_base64": {
+                          "type": "string",
+                          "maxLength": 87384,
+                          "contentEncoding": "base64"
+                        },
+                        "offset": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "bytes": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 65536
+                        },
+                        "total_bytes": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "sha256_chunk": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "sha256_artifact": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "last": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "artifact_id",
+                        "encoding",
+                        "data_base64",
+                        "offset",
+                        "bytes",
+                        "total_bytes",
+                        "sha256_chunk",
+                        "sha256_artifact",
+                        "last"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 100
+              },
+              "next_cursor": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4096
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "truncated": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "job",
+              "result_revision",
+              "section",
+              "items",
+              "next_cursor",
+              "truncated"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "worker_followup",
+      "description": "Continue/retry explicitly; select_model requires a waiting-model state and user decision.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "user_request_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "job_id": {
+            "type": "string",
+            "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "expected_attempt_id": {
+            "type": "string",
+            "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "continue",
+              "retry",
+              "select_model"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 24000
+          },
+          "delivery": {
+            "type": "string",
+            "enum": [
+              "steer",
+              "queue"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[^\\s/]+/[^\\s]+$"
+          },
+          "user_decision_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          }
+        },
+        "required": [
+          "request_id",
+          "user_request_ref",
+          "job_id",
+          "expected_attempt_id",
+          "mode",
+          "message"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "select_model"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "model",
+                "user_decision_ref"
+              ]
+            },
+            "else": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "model"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "user_decision_ref"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "delivery"
+              ]
+            },
+            "then": {
+              "properties": {
+                "mode": {
+                  "const": "continue"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_followup"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "job": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "active_attempt_id": {
+                    "type": "string",
+                    "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "starting",
+                      "running",
+                      "collecting",
+                      "waiting_approval",
+                      "waiting_model_selection",
+                      "cancel_requested",
+                      "completed",
+                      "failed",
+                      "cancelled",
+                      "needs_attention"
+                    ]
+                  },
+                  "verification_status": {
+                    "type": "string",
+                    "enum": [
+                      "not_run",
+                      "passed",
+                      "failed",
+                      "partial",
+                      "unknown"
+                    ]
+                  },
+                  "acceptance": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[^\\s/]+/[^\\s]+$"
+                  },
+                  "workspace": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "result_revision": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "attention_reason": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pending_approvals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "approval_id": {
+                          "type": "string",
+                          "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "attempt_id": {
+                          "type": "string",
+                          "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "scope_summary": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "scope_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "challenge": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 43,
+                              "maxLength": 128,
+                              "pattern": "^[A-Za-z0-9_-]+$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "channel_status": {
+                          "type": "string",
+                          "enum": [
+                            "verified",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "approval_id",
+                        "attempt_id",
+                        "action",
+                        "scope_summary",
+                        "scope_sha256",
+                        "challenge",
+                        "expires_at",
+                        "channel_status"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0,
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "active_attempt_id",
+                  "state",
+                  "verification_status",
+                  "acceptance",
+                  "model",
+                  "workspace",
+                  "created_at",
+                  "updated_at",
+                  "result_revision",
+                  "attention_reason",
+                  "pending_approvals"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "job"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "worker_cancel",
+      "description": "Request interruption of the exact recorded attempt; confirm backend stop separately.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "job_id": {
+            "type": "string",
+            "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "expected_attempt_id": {
+            "type": "string",
+            "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "request_id",
+          "job_id",
+          "expected_attempt_id"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_cancel"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "job": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "active_attempt_id": {
+                    "type": "string",
+                    "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "starting",
+                      "running",
+                      "collecting",
+                      "waiting_approval",
+                      "waiting_model_selection",
+                      "cancel_requested",
+                      "completed",
+                      "failed",
+                      "cancelled",
+                      "needs_attention"
+                    ]
+                  },
+                  "verification_status": {
+                    "type": "string",
+                    "enum": [
+                      "not_run",
+                      "passed",
+                      "failed",
+                      "partial",
+                      "unknown"
+                    ]
+                  },
+                  "acceptance": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[^\\s/]+/[^\\s]+$"
+                  },
+                  "workspace": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "result_revision": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "attention_reason": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pending_approvals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "approval_id": {
+                          "type": "string",
+                          "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "attempt_id": {
+                          "type": "string",
+                          "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "scope_summary": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "scope_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "challenge": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 43,
+                              "maxLength": 128,
+                              "pattern": "^[A-Za-z0-9_-]+$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "channel_status": {
+                          "type": "string",
+                          "enum": [
+                            "verified",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "approval_id",
+                        "attempt_id",
+                        "action",
+                        "scope_summary",
+                        "scope_sha256",
+                        "challenge",
+                        "expires_at",
+                        "channel_status"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0,
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "active_attempt_id",
+                  "state",
+                  "verification_status",
+                  "acceptance",
+                  "model",
+                  "workspace",
+                  "created_at",
+                  "updated_at",
+                  "result_revision",
+                  "attention_reason",
+                  "pending_approvals"
+                ],
+                "additionalProperties": false
+              },
+              "cancel_requested": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "job",
+              "cancel_requested"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "worker_approve",
+      "description": "Deliver a scoped, authenticated approval decision. A challenge is not proof of human consent.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "job_id": {
+            "type": "string",
+            "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "attempt_id": {
+            "type": "string",
+            "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "approval_id": {
+            "type": "string",
+            "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "challenge": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "deny"
+            ]
+          },
+          "user_decision_ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          }
+        },
+        "required": [
+          "request_id",
+          "job_id",
+          "attempt_id",
+          "approval_id",
+          "challenge",
+          "decision",
+          "user_decision_ref"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "contract_version": {
+            "const": "0.3"
+          },
+          "tool": {
+            "const": "worker_approve"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "request_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^req_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "request_id",
+              "replayed"
+            ],
+            "additionalProperties": false
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "job": {
+                "type": "object",
+                "properties": {
+                  "job_id": {
+                    "type": "string",
+                    "pattern": "^job_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "active_attempt_id": {
+                    "type": "string",
+                    "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "starting",
+                      "running",
+                      "collecting",
+                      "waiting_approval",
+                      "waiting_model_selection",
+                      "cancel_requested",
+                      "completed",
+                      "failed",
+                      "cancelled",
+                      "needs_attention"
+                    ]
+                  },
+                  "verification_status": {
+                    "type": "string",
+                    "enum": [
+                      "not_run",
+                      "passed",
+                      "failed",
+                      "partial",
+                      "unknown"
+                    ]
+                  },
+                  "acceptance": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "accepted",
+                      "rejected"
+                    ]
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512,
+                    "pattern": "^[^\\s/]+/[^\\s]+$"
+                  },
+                  "workspace": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "result_revision": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "attention_reason": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "pending_approvals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "approval_id": {
+                          "type": "string",
+                          "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "attempt_id": {
+                          "type": "string",
+                          "pattern": "^att_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                        },
+                        "action": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        },
+                        "scope_summary": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 4096
+                        },
+                        "scope_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "challenge": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 43,
+                              "maxLength": 128,
+                              "pattern": "^[A-Za-z0-9_-]+$"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "channel_status": {
+                          "type": "string",
+                          "enum": [
+                            "verified",
+                            "unavailable"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "approval_id",
+                        "attempt_id",
+                        "action",
+                        "scope_summary",
+                        "scope_sha256",
+                        "challenge",
+                        "expires_at",
+                        "channel_status"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 0,
+                    "maxItems": 20
+                  }
+                },
+                "required": [
+                  "job_id",
+                  "active_attempt_id",
+                  "state",
+                  "verification_status",
+                  "acceptance",
+                  "model",
+                  "workspace",
+                  "created_at",
+                  "updated_at",
+                  "result_revision",
+                  "attention_reason",
+                  "pending_approvals"
+                ],
+                "additionalProperties": false
+              },
+              "approval_id": {
+                "type": "string",
+                "pattern": "^apr_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "decision_recorded": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "job",
+              "approval_id",
+              "decision_recorded"
+            ],
+            "additionalProperties": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "INVALID_ARGUMENT",
+                  "UNAUTHENTICATED",
+                  "FORBIDDEN",
+                  "NOT_FOUND",
+                  "IDEMPOTENCY_CONFLICT",
+                  "BUSY",
+                  "JOB_BUSY",
+                  "STALE_ATTEMPT",
+                  "STALE_RESULT",
+                  "MODEL_NOT_ALLOWED",
+                  "MODEL_UNAVAILABLE",
+                  "CONTRACT_MISMATCH",
+                  "CAPABILITY_UNVERIFIED",
+                  "APPROVAL_REQUIRED",
+                  "APPROVAL_INVALID",
+                  "APPROVAL_EXPIRED",
+                  "APPROVAL_CHANNEL_UNAVAILABLE",
+                  "WORKSPACE_DIRTY",
+                  "WORKSPACE_CHANGED",
+                  "WORKSPACE_CONFLICT",
+                  "CURSOR_INVALID",
+                  "CURSOR_EXPIRED",
+                  "BACKEND_UNAVAILABLE",
+                  "BACKEND_TIMEOUT",
+                  "DISPATCH_AMBIGUOUS",
+                  "CANCEL_UNCONFIRMED",
+                  "EVIDENCE_INCOMPLETE",
+                  "STORAGE_FULL",
+                  "INTERNAL",
+                  "RESULT_NOT_READY"
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 1024
+                },
+                "maxProperties": 16
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "retryable",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "contract_version",
+          "tool",
+          "observed_at",
+          "receipt"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "data"
+            ],
+            "not": {
+              "required": [
+                "error"
+              ]
+            }
+          },
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "required": [
+                "data"
+              ]
+            }
+          }
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    }
+  ]
+}

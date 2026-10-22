@@ -1,0 +1,3 @@
+{"type": "step_start", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_pt1", "type": "step-start", "messageID": "msg_FAKE_curr", "sessionID": "ses_FAKE_synthetic"}}
+{"type": "step_start", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_pt2", "type": "step-start", "messageID": "msg_FAKE_prev", "sessionID": "ses_FAKE_synthetic"}}
+{"type": "text", "timestamp": "SYNTH", "sessionID": "ses_FAKE_synthetic", "part": {"id": "prt_FAKE_pt3", "type": "text", "messageID": "msg_FAKE_prev", "sessionID": "ses_FAKE_synthetic", "text": "PREVIOUS TURN FINAL ANSWER"}}
